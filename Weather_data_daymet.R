@@ -136,12 +136,12 @@ library(dplyr)
 library(fuzzyjoin)
 
 # Load weather data and ensure 'Date' is in the correct format
-weather <- read.csv("weather_acr.csv")
+weather <- read.csv("Output_daymet_acr.csv")
 weather$Date <- as.Date(weather$Date, format = "%Y-%m-%d")  # Adjust the format as per your data
 head(weather)
 
 # Load agronomic data and convert 'sd' and 'hd' into Date format
-data <- read.csv("acr_all.csv")
+data <- read.csv("acr_ag.csv")
 data <- data %>%
   mutate(
     sd = as.Date(sd, format = "%m/%d/%Y"),  # Adjust the format as per your data
@@ -230,7 +230,7 @@ write.csv(weather_summary_grain_filling, row.names = FALSE, na = '', file = past
 
 #merging data
 # Load the agronomic data from 'acr_all.csv'
-agr_data <- read.csv("acr_all.csv")
+agr_data <- read.csv("acr_ag.csv")
 
 # Load the weather summary data for the grain filling period
 grain_filling_weather <- read.csv("weather_summary_grain_filling.csv")# Convert dates in agr_data if necessary, assuming 'sd' and 'hd' are date fields
@@ -254,7 +254,7 @@ str(merged_data)
 summary(merged_data)
 
 # Write the merged data to a new CSV file
-write.csv(merged_data, "merged_acr_with_grain_filling_weather.csv", row.names = FALSE)
+write.csv(merged_data, "acr_all.csv", row.names = FALSE)
 
 
 ###############adding spring weather variables
@@ -263,7 +263,7 @@ write.csv(merged_data, "merged_acr_with_grain_filling_weather.csv", row.names = 
 library(dplyr)
 library(lubridate)  # for month() function
 
-# Assuming merged_data is already loaded and prepared
+
 # Define the months of interest
 months <- c(March = 3, April = 4, May = 5, June = 6)
 
@@ -324,7 +324,7 @@ write.csv(weather_spring_month, row.names = FALSE, na = '', file = paste0('weath
 # merging with newest version of acr_all data
 #merging data
 # Load the agronomic data from 'acr_all.csv'
-agr_data <- read.csv("acr_all_Nov21.csv")
+agr_data <- read.csv("acr_all.csv")
 
 # Load the weather summary data for the grain filling period
 month_data <- read.csv("weather_summary_by_month.csv")
@@ -348,5 +348,5 @@ str(merged_data_month)
 summary(merged_data_month)
 
 # Write the merged data to a new CSV file
-write.csv(merged_data_month, "acr_all_nov22.csv", row.names = FALSE)
+write.csv(merged_data_month, "acr_GFP_spring.csv", row.names = FALSE)
 
