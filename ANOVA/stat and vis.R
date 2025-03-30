@@ -393,8 +393,8 @@ data %>%
     position = position_dodge(1),
     size = 4,
     color = "blue4",
-    vjust = -1.55,
-    hjust = 0.78
+    vjust = -1.65,
+    hjust = 0.58
   )
 
 # saving the graph in png format. change the name accordingly
@@ -576,8 +576,8 @@ data %>%
     position = position_dodge(1),
     size = 4,
     color = "blue4",
-    vjust = -1,
-    hjust = -0.5
+    vjust = -1.60,
+    hjust = -0.2
   )
 
 # saving the graph in png format. change the name accordingly
@@ -595,7 +595,11 @@ ggsave(
 ####################################
 
 str(data)
-lys_model <- aov(lysine ~ location + id + location * id, data = data)
+#making Lysine to lysine
+data<- data %>% rename(lysine = Lysine)
+
+lys_model <- aov(
+  lysine ~ location + id + location * id, data = data)
 
 # Summary of the ANOVA model
 summary(lys_model)
@@ -759,8 +763,8 @@ data %>%
     position = position_dodge(1),
     size = 4,
     color = "blue4",
-    vjust = -1,
-    hjust = -0.25
+    vjust = -1.5,
+    hjust = -0.1
   )
 
 # saving the graph in png format. change the name accordinlys
