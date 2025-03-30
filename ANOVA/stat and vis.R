@@ -97,7 +97,7 @@ data %>%
   theme_classic() +
   theme(legend.position = "none", plot.title = element_text(size = 11)) +
   xlab("genotype") +
-  ylab("asparagine concentration (μg/g)") +
+  ylab("asparagine (μg/g)") +
   geom_text(
     data = Tk_G,
     aes(x = id, y = quant, label = cld),
@@ -156,7 +156,7 @@ data %>%
                      option = "turbo") +
   theme_classic() +
   theme(legend.position = "none", plot.title = element_text(size = 11)) + #labs(fill = "Location")+
-  xlab("location") + ylab ("asparagine concentration (μg/g)") +
+  xlab("location") + ylab ("asparagine (μg/g)") +
   geom_text(
     data = Tk_E,
     aes(x = location, y = quant, label = cld),
@@ -201,7 +201,7 @@ data %>%
   scale_fill_viridis(discrete = TRUE, alpha = 0.6) +
   theme_classic() +
   theme(legend.position = "top", plot.title = element_text(size = 11)) + labs(fill = "genotype") +
-  xlab("location") + ylab ("asparagine concentration (μg/g)") +
+  xlab("location") + ylab ("asparagine (μg/g)") +
   geom_text(
     data = Tk_GE,
     aes(x = location, y = quant, label = cld),
@@ -215,7 +215,7 @@ data %>%
 # saving the graph in Tiff format. change the name accordingly
 
 ggsave(
-  "glycinexGxE.tiff",
+  "asaxGxE.tiff",
   units = "in",
   width = 5.5,
   height = 3.75,
