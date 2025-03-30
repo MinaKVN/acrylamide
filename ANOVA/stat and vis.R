@@ -221,6 +221,188 @@ ggsave(
   height = 3.75,
   dpi = 700
 )
-
+#this is a good website for visulaization of ANOVA results
 #https://statdoe.com/barplot-for-two-factors-in-r/
 
+####################################
+#####glutamine anova and vis########
+####################################
+
+str(data)
+glu_model <- aov(glutamine ~ location + id + location * id, data = data)
+
+# Summary of the ANOVA model
+summary(glu_model)
+anova(glu_model)
+
+# Residual Plots
+
+par(mfrow = c(2, 2)) # Split the plotting panel into a 2 x 2 grid plot(model1)
+plot(glu_model)
+
+# Shapiro Wilk
+
+shapiro.test(rstandard(glu_model))
+
+# Tukey's test
+tukey <- TukeyHSD(glu_model)
+print(tukey)
+cld <- multcompLetters4(glu_model, tukey)
+print(cld)
+
+# Plot by genotype_glu with mean line
+
+Tk_G <- group_by(data, id) %>%
+  summarise(mean = mean(glutamine),
+            quant = quantile(glutamine, probs = 0.75)) %>%
+  arrange(desc(mean))
+
+# extracting the compact letter display and adding to the Tk table
+cld <- as.data.frame.list(cld$id)
+Tk_G$cld <- cld$Letters
+print(Tk_G)
+
+data %>%
+  ggplot(aes(x = id, y = glutamine, fill = id)) +
+  geom_boxplot() +
+  geom_jitter(
+    width = 0.2,
+    color = "black",
+    size = 1.3,
+    alpha = 0.2
+  ) +
+  stat_summary(
+    fun = mean,
+    geom = "point",
+    shape = 20,
+    size = 3,
+    color = "red3"
+  ) +  # Adding mean as a point
+  scale_fill_viridis(discrete = TRUE, alpha = 0.6) +
+  theme_classic() +
+  theme(legend.position = "none", plot.title = element_text(size = 11)) +
+  xlab("genotype") +
+  ylab("glutamine (μg/g)") +
+  geom_text(
+    data = Tk_G,
+    aes(x = id, y = quant, label = cld),
+    size = 5,
+    color = "blue4", 
+    vjust = -5,
+    hjust = -1)
+
+ggsave(
+  "gluxG.png",
+  units = "in",
+  width = 5.5,
+  height = 3.75,
+  dpi = 800
+)
+
+# Plot by location glu
+
+# Tukey's test
+tukey <- TukeyHSD(glu_model)
+print(tukey)
+cld <- multcompLetters4(glu_model, tukey)
+print(cld)
+
+
+# table with factors and 3rd quantile
+Tk_E <- group_by(data, location) %>%
+  summarise(mean = mean(glutamine),
+            quant = quantile(glutamine, probs = 0.75)) %>%
+  arrange(desc(mean))
+
+# extracting the compact letter display and adding to the Tk table
+
+cld <- as.data.frame.list(cld$location)
+Tk_E$cld <- cld$Letters
+print(Tk_E)
+data %>%
+  ggplot(aes(x = location, y = glutamine, fill = location)) +
+  geom_boxplot() +
+  geom_jitter(
+    width = 0.2,
+    color = "black",
+    size = 1.3,
+    alpha = 0.2
+  ) +
+  
+  stat_summary(
+    fun = mean,
+    geom = "point",
+    shape = 20,
+    size = 3,
+    color = "red3"
+  ) +  # Adding mean as a point
+  scale_fill_viridis(discrete = TRUE,
+                     alpha = 0.6,
+                     option = "turbo") +
+  theme_classic() +
+  theme(legend.position = "none", plot.title = element_text(size = 11)) + #labs(fill = "Location")+
+  xlab("location") + ylab ("glutamine (μg/g)") +
+  geom_text(
+    data = Tk_E,
+    aes(x = location, y = quant, label = cld),
+    size = 5,
+    color = "blue4",
+    vjust = -5,
+    hjust = -0.2
+  )
+
+# saving the graph in Tiff format. change the name accordingly
+
+ggsave(
+  "gluxE.png",
+  units = "in",
+  width = 5.5,
+  height = 3.75,
+  dpi = 800
+)
+
+# Plot by location and genotype glu
+# Tukey's test
+
+tukey <- TukeyHSD(glu_model)
+print(tukey)
+cld <- multcompLetters4(glu_model, tukey)
+print(cld)
+# table with factors and 3rd quantile
+Tk_GE <- data %>%
+  group_by(location, id) %>%
+  summarise(mean = mean(glutamine),
+            quant = quantile(glutamine, probs = 0.75)) %>%
+  arrange(desc(mean))
+
+# extracting the compact letter display and adding to the Tk table
+
+cld <- as.data.frame.list(cld$'location:id')
+Tk_GE$cld <- cld$Letters
+print(Tk_GE)
+data %>%
+  ggplot(aes(x = location, y = glutamine, fill = id)) +
+  geom_boxplot(width = 0.3, position = position_dodge(width = 1)) +
+  scale_fill_viridis(discrete = TRUE, alpha = 0.6) +
+  theme_classic() +
+  theme(legend.position = "top", plot.title = element_text(size = 11)) + labs(fill = "genotype") +
+  xlab("location") + ylab ("glutamine (μg/g)") +
+  geom_text(
+    data = Tk_GE,
+    aes(x = location, y = quant, label = cld),
+    position = position_dodge(1),
+    size = 4,
+    color = "blue4",
+    vjust = -1.55,
+    hjust = 0.78
+  )
+
+# saving the graph in Tiff format. change the name accordingly
+
+ggsave(
+  "gluxGxE.tiff",
+  units = "in",
+  width = 5.5,
+  height = 3.75,
+  dpi = 700
+)
