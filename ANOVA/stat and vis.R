@@ -947,7 +947,7 @@ data %>%
     position = position_dodge(1),
     size = 4,
     color = "blue4",
-    vjust = -1,
+    vjust = -1.2,
     hjust = -0.35
   )
 
