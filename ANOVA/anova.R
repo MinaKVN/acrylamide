@@ -1,22 +1,19 @@
-library(stringr)
-library(purrr)
-library(janitor)
-library(MuMIn)
-library(broom)
-library(forcats)
 library(tidyverse)
-library(arm)
-library(vegan)
-library(ggvegan)
+library(lme4)
+library(lmerTest)
+library(emmeans)
+library(multcompView)
+library(RVAideMemoire)
 library(dplyr)
-library(visreg)
-library(car)
-library(reshape2)
-library(MASS)
+
 
 # Load data
 data <- read.csv("acr_all.csv")
 str(data)
+
+data$id <- as.factor(data$id)
+data$location    <- as.factor(data$location)
+data$asparagine <- as.numeric(data$asparagine)
 
 ## what assumptions should we be checking?
 # 1. Residuals are random - no relationship to our treatment
@@ -25,23 +22,44 @@ str(data)
 # 4. Residuals have a mean of 0)
 # Fit the ANOVA model
 
-
-# Assuming 'data' is your dataset and you want to model the interaction between location and genotype
-aov_model <- aov(
-  asparagine ~ location + genotype + location * genotype,
+## asparagine
+#  want to model the interaction between location and genotype
+asa_model <- aov(
+  asparagine ~ location + id + location * id,
   data = data)
 
 # Summary of the ANOVA model
-summary(aov_model)
+summary(asa_model)
+anova(asa_model)
 
-#Randomness of residuals
-plot(residuals(aov_model) ~ fitted(aov_model), xlab = "Fitted values", ylab = "Residuals")
-abline(h = 0, col = "red")
-#Homogeneity of Residuals (Homoscedasticity)
-leveneTest(residuals(aov_model), group = data$genotype)
+# Residual Plots 
+par(mfrow = c(2, 2)) # Split the plotting panel into a 2 x 2 grid plot(model1)
+plot(asa_model)
 
-#Normality of Residuals
-qqnorm(residuals(aov_model))
-qqline(residuals(aov_model), col = "red")
-shapiro.test(residuals(aov_model))
-mean(residuals(aov_model))
+# Shapiro Wilk 
+shapiro.test(rstandard(asa_model))
+
+# Tukey's test
+tukey <- TukeyHSD(asa_model)
+print(tukey)
+cld <- multcompLetters4(asa_model, tukey)
+print(cld)
+
+
+# table with factors and 3rd quantile
+Tk <- group_by(data, id) %>%
+  summarise(mean=mean(asparagine), quant = quantile(asparagine, probs = 0.75)) %>%
+  arrange(desc(mean))
+
+# extracting the compact letter display and adding to the Tk table
+cld <- as.data.frame.list(cld$id)
+Tk$cld <- cld$Letters
+
+print(Tk)
+
+ggplot(data, aes(id, asparagine)) + 
+  geom_boxplot() +
+  labs(x="genotype", y="asparagine") +
+  theme_bw() + 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  geom_text(data = Tk, aes(x = id, y = quant, label = cld), size = 3, vjust=-1, hjust =-1)
