@@ -215,7 +215,7 @@ data %>%
 # saving the graph in Tiff format. change the name accordingly
 
 ggsave(
-  "asaxGxE.tiff",
+  "asaxGxE.png",
   units = "in",
   width = 5.5,
   height = 3.75,
@@ -400,7 +400,7 @@ data %>%
 # saving the graph in Tiff format. change the name accordingly
 
 ggsave(
-  "gluxGxE.tiff",
+  "gluxGxE.png",
   units = "in",
   width = 5.5,
   height = 3.75,
