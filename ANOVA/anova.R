@@ -5,6 +5,9 @@ library(emmeans)
 library(multcompView)
 library(RVAideMemoire)
 library(dplyr)
+library(hrbrthemes)
+library(viridis)
+library(ggplot2)
 
 
 # Load data
@@ -47,19 +50,29 @@ print(cld)
 
 
 # table with factors and 3rd quantile
-Tk <- group_by(data, id) %>%
+Tk_id <- group_by(data, id) %>%
   summarise(mean=mean(asparagine), quant = quantile(asparagine, probs = 0.75)) %>%
   arrange(desc(mean))
 
 # extracting the compact letter display and adding to the Tk table
 cld <- as.data.frame.list(cld$id)
-Tk$cld <- cld$Letters
+Tk_id$cld <- cld$Letters
 
-print(Tk)
+print(Tk_id)
 
-ggplot(data, aes(id, asparagine)) + 
+data %>%
+  ggplot(aes(x=id, y=asparagine, fill=id)) +
   geom_boxplot() +
-  labs(x="genotype", y="asparagine") +
-  theme_bw() + 
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
-  geom_text(data = Tk, aes(x = id, y = quant, label = cld), size = 3, vjust=-1, hjust =-1)
+  geom_jitter(width = 0.2, color = "black", size = 1.3, alpha = 0.2) +
+  stat_summary(fun = mean, geom = "point", shape = 20, size = 3, color = "red3") +  # Adding mean as a point
+  scale_fill_viridis(discrete = TRUE, alpha=0.6) +
+  theme_classic() +
+  theme(
+    legend.position="none",
+    plot.title = element_text(size=11)
+  ) +
+  xlab("genotype") +
+  ylab("asparagine concentration (μg/g)")+
+  geom_text(data = Tk_id, aes(x = id, y = quant, label = cld), size = 5, vjust=-11, hjust =0.5)
+
+ggsave("asa_id_boxplot.png", width = 4, height = 3, dpi = 1000)
